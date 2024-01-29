@@ -228,19 +228,6 @@ class HttpProtocol(HttpProtocolMixin, SanicProtocol, metaclass=TouchUpMeta):
         except Exception:
             error_logger.exception("protocol.check_timeouts")
 
-    def close(self, timeout: Optional[float] = None):
-        """
-        Requires to prevent checking timeouts for closed connections
-        """
-        if timeout is not None:
-            super().close(timeout=timeout)
-            return
-        if self._callback_check_timeouts:
-            self._callback_check_timeouts.cancel()
-            if self.transport:
-                self.transport.close()
-                self.abort()
-
     async def send(self, data):  # no cov
         """
         Writes HTTP data with backpressure control.
